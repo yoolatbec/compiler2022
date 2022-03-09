@@ -1,5 +1,5 @@
 /*
- * state_machine.h
+ * status_machine.h
  *
  *  Created on: 2022年2月26日
  *      Author: yoolatbec
@@ -12,32 +12,25 @@
 #include <modules/lexical/acceptance_func.h>
 #include <reserved_word.h>
 
-#define NODE_ATTR_NORMAL (0)
-#define NODE_ATTR_START (1 << 0)
-#define NODE_ATTR_FINAL (1 << 1)
+struct sSMEdge;
 
-struct sSTEdge;
+typedef void (*BY_EFFECT)(void*);
 
-typedef struct sSTNode{
-	struct sSTEdge* first_edge;
+typedef struct sSMNode {
+	struct sSMEdge *first_edge;
 	int node_attr;
-} sSTNode;
+	BY_EFFECT action;
+} sSMNode;
 
-typedef struct sSTEdge{
-	sSTNode* target_node;
-	struct sSTEdge* next;
+typedef struct sSMEdge {
+	sSMNode *target_node;
+	struct sSMEdge *next;
 	ACC_FUNC acc_func;
-	char* data;
-	void (*func)(void*);
-} sSTEdge;
+	char *data;
+	BY_EFFECT by_effect;
+} sSMEdge;
 
-int st_add_reserved_word(sSTNode**, sReservedWord*);
-
-int st_merge(sSTNode**, sSTNode*);
-
-int st_new_node(sSTNode**);
-int st_new_edge(sSTEdge**);
-int st_free_node(sSTNode*);
-int st_free_edge(sSTEdge*);
+int sm_add_reserved_word(sSMNode*, sReservedWord*);
+int sm_merge(sSMNode*, sSMNode*);
 
 #endif /* INCLUDE_MODULES_LEXICAL_STATUS_MACHINE_H_ */
