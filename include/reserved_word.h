@@ -230,7 +230,7 @@ extern const sReservedWord rw_multiply_assign;
 extern const sReservedWord rw_divide_assign;
 
 #define RW_ID_MOD_ASSIGN (74)
-extern const sReservedWord rw_mode_assign;
+extern const sReservedWord rw_mod_assign;
 
 #define RW_ID_LEFT_SHIFT_ASSIGN (75)
 extern const sReservedWord rw_left_shift_assign;
@@ -261,5 +261,7 @@ extern const sReservedWord rw_quotation_mark;
 
 #define RW_ID_SINGLE_QUOTATION_MARK (84)
 extern const sReservedWord rw_single_quotation_mark;
+
+extern const sReservedWord* const reserved_words[];
 
 #endif /* INCLUDE_RESERVED_WORD_H_ */

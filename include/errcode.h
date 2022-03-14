@@ -15,6 +15,7 @@
 #define FILE_CAN_NOT_OPEN (4)
 #define BUFFER_NOT_AVAILABLE (5)
 #define FILE_INPUT_SOURCE_CLOSED (6)
+#define CAN_NOT_OPEN_FILE (7)
 
 
 #endif /* INCLUDE_ERRCODE_H_ */

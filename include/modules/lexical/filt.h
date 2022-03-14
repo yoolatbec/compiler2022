@@ -13,17 +13,17 @@
 #include <modules/lexical/file_input.h>
 #include <utils/linked_list.h>
 
-typedef struct primitive {
+typedef struct sPrimitive {
 	char *value;
 	int primitive_attr;
-} primitive;
+} sPrimitive;
 
-typedef struct primitive_value_buffer {
+typedef struct sPrimitiveValueBuffer {
 	char *value_arr_ptr;
 	size_t cursor;
-	struct primitive_value_buffer *next;
-} primitive_value_buffer;
+	struct sPrimitiveValueBuffer *next;
+} sPrimitiveValueBuffer;
 
-
+int filt(sInputBufferDesc*, sLinkedListNode*, sPrimitiveValueBuffer*);
 
 #endif /* INCLUDE_MODULES_LEXICAL_FILT_H_ */

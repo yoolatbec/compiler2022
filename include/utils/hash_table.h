@@ -18,6 +18,6 @@ sHashTableNode* hash_table_remove_key(sHashTableNode*, int);
 sLinkedListNode* hash_table_get_values(sHashTableNode*, int);
 int hash_table_contains(sHashTableNode*, int, void*);
 int hash_table_contains_key(sHashTableNode*, int);
-void hash_table_clear(sHashTableNode*);
+sHashTableNode* hash_table_clear(sHashTableNode*);
 
 #endif /* INCLUDE_UTILS_HASH_TABLE_H_ */

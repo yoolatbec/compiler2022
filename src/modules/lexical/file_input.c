@@ -14,16 +14,24 @@
 
 #define INPUT_CURSOR_DEFAULT (0)
 
-int fill_buffer(input_source_desc *input_src, buffer_desc *buffer) {
+#define INPUT_SOURCE_FINISHED (1 << 0)
+#define INPUT_SOURCE_CLOSED (1 << 1)
+#define BUFFER_0_UNFILLED (1 << 0)
+#define BUFFER_1_UNFILLED (1 << 1)
+
+#define INPUT_SOURCE_IS_CLOSED(src) (src->input_source_attr & INPUT_SOURCE_CLOSED)
+#define INPUT_SOURCE_IS_FINISHED(src) (src->input_source_attr & INPUT_SOURCE_FINISHED)
+
+int fill_buffer(sInputSourceDesc *input_src, sInputBufferDesc *buffer) {
 	if (input_src == NULL || buffer == NULL || input_src->input_file_ptr == NULL) {
 		return INVALID_ARGUMENT;
 	}
 
-	if (input_src->input_source_attr & INPUT_SOURCE_CLOSED) {
+	if (INPUT_SOURCE_IS_CLOSED(input_src)) {
 		return FILE_INPUT_SOURCE_CLOSED;
 	}
 
-	if (input_src->input_source_attr & INPUT_SOURCE_FINISHED) {
+	if (INPUT_SOURCE_IS_FINISHED(input_src)) {
 		return FILE_UNREAD_CONTENT_NULL;
 	}
 
@@ -59,7 +67,7 @@ int fill_buffer(input_source_desc *input_src, buffer_desc *buffer) {
 	return SUCCESS;
 }
 
-int close_input_source(input_source_desc *input_src) {
+int close_input_source(sInputSourceDesc *input_src) {
 	if (input_src == NULL || input_src->input_file_ptr == NULL) {
 		return INVALID_ARGUMENT;
 	}
@@ -72,3 +80,18 @@ int close_input_source(input_source_desc *input_src) {
 	return SUCCESS;
 }
 
+sInputSourceDesc* open_input_source(char *path) {
+	FILE *file = fopen(path, "r");
+
+	if (file == NULL) {
+		return NULL;
+	}
+
+	sInputSourceDesc *desc = (sInputSourceDesc*) malloc(
+			sizeof(sInputSourceDesc));
+	desc->input_file_ptr = file;
+	desc->input_file_cursor = INPUT_CURSOR_DEFAULT;
+	desc->input_source_attr = 0;
+
+	return desc;
+}

@@ -19,7 +19,7 @@ struct sLinkedListNode {
 
 sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 	if (head == NULL) {
-		head = (sLinkedListNode*)malloc(sizeof(sLinkedListNode));
+		head = (sLinkedListNode*) malloc(sizeof(sLinkedListNode));
 		head->data = data;
 		head->next = NULL;
 		head->prev = NULL;
@@ -27,35 +27,8 @@ sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 		return head;
 	}
 
-	sLinkedListNode *new_node = (sLinkedListNode*)malloc(
-		sizeof(sLinkedListNode));
-	new_node->data = data;
-	new_node->next = head->next;
-	new_node->prev = head;
-	head->next = new_node;
-
-	if (head->prev == NULL) {
-		head->prev = new_node;
-		new_node->next = head;
-	} else {
-		new_node->next->prev = new_node;
-	}
-
-	return head;
-}
-
-sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
-	if (head == NULL) {
-		head = (sLinkedListNode*)malloc(sizeof(sLinkedListNode));
-		head->data = data;
-		head->next = NULL;
-		head->prev = NULL;
-
-		return head;
-	}
-
-	sLinkedListNode *new_node = (sLinkedListNode*)malloc(
-		sizeof(sLinkedListNode));
+	sLinkedListNode *new_node = (sLinkedListNode*) malloc(
+			sizeof(sLinkedListNode));
 	new_node->data = data;
 	new_node->next = head;
 	new_node->prev = head->prev;
@@ -71,8 +44,35 @@ sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
 	return head;
 }
 
+sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
+	if (head == NULL) {
+		head = (sLinkedListNode*) malloc(sizeof(sLinkedListNode));
+		head->data = data;
+		head->next = NULL;
+		head->prev = NULL;
+
+		return head;
+	}
+
+	sLinkedListNode *new_node = (sLinkedListNode*) malloc(
+			sizeof(sLinkedListNode));
+	new_node->data = data;
+	new_node->next = head;
+	new_node->prev = head->prev;
+	head->prev = new_node;
+
+	if (head->next == NULL) {
+		head->next = new_node;
+		new_node->prev = head;
+	} else {
+		new_node->prev->next = new_node;
+	}
+
+	return new_node;
+}
+
 sLinkedListNode* linked_list_insert(sLinkedListNode *head, void *data,
-	size_t position) {
+		size_t position) {
 	if (head == NULL) {
 		return linked_list_append(head, data);
 	}
@@ -185,6 +185,9 @@ sLinkedListNode* linked_list_remove_nth(sLinkedListNode *head, size_t position) 
 		--position;
 	}
 
+	if(current == head){
+		head = head->next;
+	}
 	linked_list_remove_first(current);
 
 	return head;

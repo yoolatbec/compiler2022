@@ -8,6 +8,8 @@
 #ifndef INCLUDE_UTILS_LINKED_LIST_H_
 #define INCLUDE_UTILS_LINKED_LIST_H_
 
+#include <stdlib.h>
+
 typedef struct sLinkedListNode sLinkedListNode;
 
 sLinkedListNode* linked_list_append(sLinkedListNode*, void*);
