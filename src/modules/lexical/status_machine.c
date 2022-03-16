@@ -24,7 +24,7 @@
 #define RULE_TREE_NODE_ATTR_ONE_OR_MORE (1 << 0)
 #define RULE_TREE_NODE_ATTR_ZERO_OR_MORE (1 << 1)
 
-int sm_add_reserved_word(sSMNode *head, sReservedWord *kw) {
+int sm_add_reserved_word(sSMNode *head, const sReservedWord *kw) {
 	if (head == NULL || kw == NULL) {
 		return INVALID_ARGUMENT;
 	}
@@ -62,6 +62,9 @@ int sm_add_reserved_word(sSMNode *head, sReservedWord *kw) {
 		current_node->first_edge = new_edge;
 
 		current_node = new_node;
+		new_node->first_edge = NULL;
+		new_node->node_attr = 0;
+		++kw_cursor;
 
 		OUTER_END:
 		;
@@ -104,8 +107,8 @@ int sm_merge(sSMNode *head, sSMNode *another_head) {
 					| visited_mark);
 		}
 
-		if (current_edge->next == another_head) {
-			current_edge->next = head;
+		if (current_edge->target_node == another_head) {
+			current_edge->target_node = head;
 		}
 
 		linked_list_remove_first(queue);
@@ -122,7 +125,7 @@ int sm_merge(sSMNode *head, sSMNode *another_head) {
 	while (queue != NULL) {
 		current_edge = (sSMEdge*)linked_list_first(queue);
 
-		if ((long)current_edge->target_node->first_edge & visited_mark != 0) {
+		if (((long)current_edge->target_node->first_edge & visited_mark) != 0) {
 			current_edge->target_node->first_edge =
 				(sSMEdge*)((long)current_edge->target_node->first_edge
 					& ~visited_mark);
@@ -148,6 +151,6 @@ int sm_merge(sSMNode *head, sSMNode *another_head) {
 
 	free(another_head);
 
-	return head;
+	return SUCCESS;
 }
 

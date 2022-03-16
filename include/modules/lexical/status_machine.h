@@ -30,7 +30,7 @@ typedef struct sSMEdge {
 	BY_EFFECT by_effect;
 } sSMEdge;
 
-int sm_add_reserved_word(sSMNode*, sReservedWord*);
+int sm_add_reserved_word(sSMNode*, const sReservedWord*);
 int sm_merge(sSMNode*, sSMNode*);
 
 #endif /* INCLUDE_MODULES_LEXICAL_STATUS_MACHINE_H_ */

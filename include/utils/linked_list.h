@@ -9,6 +9,7 @@
 #define INCLUDE_UTILS_LINKED_LIST_H_
 
 #include <stdlib.h>
+#define DEBUG
 
 typedef struct sLinkedListNode sLinkedListNode;
 
@@ -23,7 +24,13 @@ void* linked_list_first(sLinkedListNode*);
 void* linked_list_last(sLinkedListNode*);
 void* linked_list_nth(sLinkedListNode*, size_t);
 size_t linked_list_size(sLinkedListNode*);
-void linked_list_clear(sLinkedListNode*);
+sLinkedListNode* linked_list_clear(sLinkedListNode*);
 int linked_list_contains(sLinkedListNode*, void*);
+
+#ifdef DEBUG
+
+void linked_list_test(sLinkedListNode*);
+
+#endif
 
 #endif /* INCLUDE_UTILS_LINKED_LIST_H_ */

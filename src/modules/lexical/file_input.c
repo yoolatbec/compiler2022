@@ -6,6 +6,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <modules/lexical/file_input.h>
 

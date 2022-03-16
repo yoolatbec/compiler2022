@@ -27,7 +27,6 @@ int sm_build_identifier_acc_path(sSMNode *head) {
 	}
 
 	sSMNode *node = (sSMNode*)malloc(sizeof(sSMNode));
-	node->node_attr = 0;
 	edge->acc_func = identifier_head_char_acc_func;
 	edge->next = NULL;
 	edge->data = NULL;
@@ -35,6 +34,7 @@ int sm_build_identifier_acc_path(sSMNode *head) {
 
 	edge = (sSMEdge*)malloc(sizeof(sSMEdge));
 	node->first_edge = edge;
+	node->node_attr = PRIM_ID_IDENTIFIER;
 
 	edge->acc_func = identifier_char_acc_func;
 	edge->data = NULL;
@@ -453,7 +453,7 @@ int sm_build_string_acc_path(sSMNode *head) {
 
 	node = (sSMNode*)malloc(sizeof(sSMNode));
 	edge->acc_func = single_char_acc_func;
-	edge->data = '\"';
+	edge->data = (char*)'\"';
 	edge->target_node = node;
 
 	node->first_edge = NULL;
@@ -464,7 +464,7 @@ int sm_build_string_acc_path(sSMNode *head) {
 	edge->next = (sSMEdge*)malloc(sizeof(sSMEdge));
 	edge = edge->next;
 	edge->acc_func = single_char_acc_func;
-	edge->data = '\\';
+	edge->data = (char*)'\\';
 	edge->next = NULL;
 	edge->target_node = node;
 
@@ -480,9 +480,11 @@ int sm_build_string_acc_path(sSMNode *head) {
 	return SUCCESS;
 }
 
-int sm_build_float_acc_path(sSMNode *head) {
-
-}
+//int sm_build_float_acc_path(sSMNode *head) {
+//	if(head == NULL){
+//		return INVALID_ARGUMENT;
+//	}
+//}
 
 int sm_build_char_acc_path(sSMNode *head) {
 	if (head == NULL) {
@@ -562,6 +564,7 @@ int sm_build_blank_ignore_path(sSMNode *head) {
 	edge->data = NULL;
 	edge->by_effect = NULL;
 	edge->target_node = node;
+	node->first_edge = edge;
 
 	return SUCCESS;
 }
@@ -624,5 +627,23 @@ int sm_build_comment_ignore_path(sSMNode *head) {
 	edge->next = NULL;
 
 	return SUCCESS;
+}
 
+int sm_build_input_src_end_path(sSMNode *head) {
+	if (head == NULL) {
+		return INVALID_ARGUMENT;
+	}
+
+	sSMEdge *edge = (sSMEdge*)malloc(sizeof(sSMEdge));
+	edge->acc_func = single_char_acc_func;
+	edge->data = (char*)'\0';
+	edge->next = head->first_edge;
+	head->first_edge = edge;
+
+	sSMNode *node = (sSMNode*)malloc(sizeof(sSMNode));
+	edge->target_node = node;
+	node->first_edge = NULL;
+	node->node_attr = INPUT_SRC_END;
+
+	return SUCCESS;
 }

@@ -39,19 +39,22 @@ int sm_build_hexadecimal_integer_acc_path(sSMNode*);
 int sm_build_binary_integer_acc_path(sSMNode*);
 
 #define PRIM_ID_CHAR (117)
-int sm_build_char_acc_path();
+int sm_build_char_acc_path(sSMNode*);
 
 #define PRIM_ID_STRING (120)
 int sm_build_string_acc_path(sSMNode*);
 
 #define PRIM_ID_FLOAT (121)
 #define PRIM_ID_DOUBLE (122)
-int sm_build_float_acc_path(sSMNode*);
+//int sm_build_float_acc_path(sSMNode*);
 
 #define PRIM_ID_ZERO (125)
 
 #define PRIM_ID_BLANK_IGNORE (130)
-int sm_build_blank_ignore_path();
+int sm_build_blank_ignore_path(sSMNode*);
 int sm_build_comment_ignore_path(sSMNode*);
+
+#define INPUT_SRC_END (1024)
+int sm_build_input_src_end_path(sSMNode*);
 
 #endif /* INCLUDE_MODULES_LEXICAL_SM_UTIL_FUNC_H_ */

@@ -8,6 +8,10 @@
 #include <utils/linked_list.h>
 #include <stdlib.h>
 
+#ifdef DEBUG
+#include <stdio.h>
+#endif
+
 #define FALSE (0)
 #define TRUE (!FALSE)
 
@@ -19,7 +23,7 @@ struct sLinkedListNode {
 
 sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 	if (head == NULL) {
-		head = (sLinkedListNode*) malloc(sizeof(sLinkedListNode));
+		head = (sLinkedListNode*)malloc(sizeof(sLinkedListNode));
 		head->data = data;
 		head->next = NULL;
 		head->prev = NULL;
@@ -27,8 +31,8 @@ sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 		return head;
 	}
 
-	sLinkedListNode *new_node = (sLinkedListNode*) malloc(
-			sizeof(sLinkedListNode));
+	sLinkedListNode *new_node = (sLinkedListNode*)malloc(
+		sizeof(sLinkedListNode));
 	new_node->data = data;
 	new_node->next = head;
 	new_node->prev = head->prev;
@@ -46,7 +50,7 @@ sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 
 sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
 	if (head == NULL) {
-		head = (sLinkedListNode*) malloc(sizeof(sLinkedListNode));
+		head = (sLinkedListNode*)malloc(sizeof(sLinkedListNode));
 		head->data = data;
 		head->next = NULL;
 		head->prev = NULL;
@@ -54,8 +58,8 @@ sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
 		return head;
 	}
 
-	sLinkedListNode *new_node = (sLinkedListNode*) malloc(
-			sizeof(sLinkedListNode));
+	sLinkedListNode *new_node = (sLinkedListNode*)malloc(
+		sizeof(sLinkedListNode));
 	new_node->data = data;
 	new_node->next = head;
 	new_node->prev = head->prev;
@@ -72,7 +76,7 @@ sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
 }
 
 sLinkedListNode* linked_list_insert(sLinkedListNode *head, void *data,
-		size_t position) {
+	size_t position) {
 	if (head == NULL) {
 		return linked_list_append(head, data);
 	}
@@ -185,7 +189,7 @@ sLinkedListNode* linked_list_remove_nth(sLinkedListNode *head, size_t position) 
 		--position;
 	}
 
-	if(current == head){
+	if (current == head) {
 		head = head->next;
 	}
 	linked_list_remove_first(current);
@@ -249,10 +253,12 @@ size_t linked_list_size(sLinkedListNode *head) {
 	return size;
 }
 
-void linked_list_clear(sLinkedListNode *head) {
+sLinkedListNode* linked_list_clear(sLinkedListNode *head) {
 	while (head != NULL) {
 		head = linked_list_remove_first(head);
 	}
+
+	return NULL;
 }
 
 int linked_list_contains(sLinkedListNode *head, void *data) {
@@ -275,3 +281,18 @@ int linked_list_contains(sLinkedListNode *head, void *data) {
 
 	return FALSE;
 }
+
+#ifdef DEBUG
+
+void linked_list_test(sLinkedListNode *head) {
+	sLinkedListNode *current = head;
+	printf("%d ", (int)current->data);
+	current = current->next;
+	while (current != NULL && current != head) {
+		printf("%d ", (int)current->data);
+		current = current->next;
+	}
+	putchar('\n');
+}
+
+#endif

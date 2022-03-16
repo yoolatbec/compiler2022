@@ -20,4 +20,10 @@ int hash_table_contains(sHashTableNode*, int, void*);
 int hash_table_contains_key(sHashTableNode*, int);
 sHashTableNode* hash_table_clear(sHashTableNode*);
 
+#ifdef DEBUG
+
+void hash_table_test(sHashTableNode*);
+
+#endif
+
 #endif /* INCLUDE_UTILS_HASH_TABLE_H_ */
