@@ -12,12 +12,19 @@
 #include <stdio.h>
 #include <modules/lexical/sm_util_func.h>
 
-int main() {
+int main(int argc, char** argv) {
+	if(argc < 2){
+		puts("usage: dcc file_name");
+		return -1;
+	}
 
 	sSMNode *start_node = (sSMNode*)malloc(sizeof(sSMNode));
 	sm_build_input_src_end_path(start_node);
 	sm_build_identifier_acc_path(start_node);
 	sm_build_integer_acc_path(start_node);
+	sm_build_octal_integer_acc_path(start_node);
+	sm_build_hexadecimal_integer_acc_path(start_node);
+	sm_build_binary_integer_acc_path(start_node);
 	sm_build_char_acc_path(start_node);
 	sm_build_string_acc_path(start_node);
 	sm_build_blank_ignore_path(start_node);
@@ -28,7 +35,12 @@ int main() {
 		++i;
 	}
 
-	char *str = "int a = 100;";
+	FILE* file = fopen(argv[1], "r");
+	char str[4096];
+	size_t size = fread(str, 1, 4096, file);
+	fclose(file);
+	printf("%ld\n", size);
+
 	sLinkedListNode *status = NULL;
 	sLinkedListNode *last_status = NULL;
 	int cursor = 0;

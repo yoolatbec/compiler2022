@@ -44,19 +44,19 @@ typedef struct sHashTableEnd {
 
 int hash_table_has_too_few_branches(sHashTableNode *node) {
 	return (!hash_table_is_root(node)
-		&& node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]
-			< HASH_TABLE_NEW_NODE_BRANCH_COUNT)
-		|| (hash_table_is_root(node)
-			&& node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] == 1);
+			&& node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]
+					< HASH_TABLE_NEW_NODE_BRANCH_COUNT)
+			|| (hash_table_is_root(node)
+					&& node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] == 1);
 }
 
 int hash_table_has_too_many_branches(sHashTableNode *node) {
 	return node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]
-		> HASH_TABLE_NODE_BRANCH_COUNT;
+			> HASH_TABLE_NODE_BRANCH_COUNT;
 }
 
 int hash_table_is_leaf(sHashTableNode *node) {
-	return ((long)(node->parent) & HASH_TABLE_NODE_LEAF_MARK) != 0;
+	return ((long) (node->parent) & HASH_TABLE_NODE_LEAF_MARK) != 0;
 }
 
 int hash_table_is_root(sHashTableNode *node) {
@@ -64,13 +64,13 @@ int hash_table_is_root(sHashTableNode *node) {
 }
 
 void hash_table_make_leaf(sHashTableNode *node) {
-	node->parent = (sHashTableNode*)((long)node->parent
-		| HASH_TABLE_NODE_LEAF_MARK);
+	node->parent = (sHashTableNode*) ((long) node->parent
+			| HASH_TABLE_NODE_LEAF_MARK);
 }
 
 sHashTableNode* hash_table_put(sHashTableNode *root, int key, void *value) {
 	if (root == NULL) {
-		root = (sHashTableNode*)malloc(sizeof(sHashTableNode));
+		root = (sHashTableNode*) malloc(sizeof(sHashTableNode));
 		root->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] = 0;
 		root->parent = NULL;
 		hash_table_make_leaf(root);
@@ -80,30 +80,30 @@ sHashTableNode* hash_table_put(sHashTableNode *root, int key, void *value) {
 	while (!hash_table_is_leaf(current)) {
 		int branch = 0;
 		for (; branch < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-			++branch) {
+				++branch) {
 			if (key < current->branch_tag[branch]) {
 				break;
 			}
 		}
 
-		current = (sHashTableNode*)current->branches[branch];
+		current = (sHashTableNode*) current->branches[branch];
 	}
 
 	current = hash_table_leaf_put(current, key, value);
 
 	while (current != NULL && !hash_table_is_root(current)) {
 		current = hash_table_internal_node_put(
-			HASH_TABLE_NODE_GET_PARENT(current), current);
+				HASH_TABLE_NODE_GET_PARENT(current), current);
 	}
 
 	if (current != NULL && hash_table_is_root(current)) {
-		sHashTableNode *new_root = (sHashTableNode*)malloc(
-			sizeof(sHashTableNode));
+		sHashTableNode *new_root = (sHashTableNode*) malloc(
+				sizeof(sHashTableNode));
 		new_root->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] = 2;
 		new_root->branch_tag[0] =
-			current->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT];
+				current->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT];
 		new_root->branches[0] = root;
-		new_root->branches[1] = (void*)current;
+		new_root->branches[1] = (void*) current;
 		new_root->parent = NULL;
 
 		root->parent = new_root;
@@ -120,11 +120,11 @@ sHashTableNode* hash_table_put(sHashTableNode *root, int key, void *value) {
 }
 
 sHashTableNode* hash_table_internal_node_put(sHashTableNode *node,
-	sHashTableNode *branch) {
+		sHashTableNode *branch) {
 	int tag = branch->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1];
 	int index = 0;
 	for (; index < node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-		index++) {
+			index++) {
 		if (tag < node->branch_tag[index]) {
 			break;
 		}
@@ -150,7 +150,7 @@ sHashTableNode* hash_table_internal_node_put(sHashTableNode *node,
 
 sHashTableNode* hash_table_leaf_put(sHashTableNode *leaf, int key, void *value) {
 	if (leaf->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] == 0) {
-		sHashTableEnd *end = (sHashTableEnd*)malloc(sizeof(sHashTableEnd));
+		sHashTableEnd *end = (sHashTableEnd*) malloc(sizeof(sHashTableEnd));
 		end->key = key;
 		end->values = linked_list_append(NULL, value);
 		leaf->branches[0] = end;
@@ -160,7 +160,7 @@ sHashTableNode* hash_table_leaf_put(sHashTableNode *leaf, int key, void *value) 
 
 	int branch = 0;
 	for (; branch < leaf->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-		branch++) {
+			branch++) {
 		if (key < leaf->branch_tag[branch]) {
 			break;
 		}
@@ -179,7 +179,7 @@ sHashTableNode* hash_table_leaf_put(sHashTableNode *leaf, int key, void *value) 
 	}
 
 	leaf->branch_tag[branch] = key;
-	end = (sHashTableEnd*)malloc(sizeof(sHashTableEnd));
+	end = (sHashTableEnd*) malloc(sizeof(sHashTableEnd));
 	end->key = key;
 	end->values = linked_list_append(NULL, value);
 	leaf->branches[branch + 1] = end;
@@ -194,7 +194,7 @@ sHashTableNode* hash_table_leaf_put(sHashTableNode *leaf, int key, void *value) 
 }
 
 sHashTableNode* hash_table_split(sHashTableNode *node) {
-	sHashTableNode *new_node = (sHashTableNode*)malloc(sizeof(sHashTableNode));
+	sHashTableNode *new_node = (sHashTableNode*) malloc(sizeof(sHashTableNode));
 	new_node->parent = node->parent;
 
 	new_node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] =
@@ -204,15 +204,15 @@ sHashTableNode* hash_table_split(sHashTableNode *node) {
 
 	for (int i = 0; i < HASH_TABLE_NEW_NODE_BRANCH_COUNT; i++) {
 		new_node->branches[i] = node->branches[HASH_TABLE_NEW_NODE_BRANCH_COUNT
-			+ i];
+				+ i];
 		node->branches[HASH_TABLE_NEW_NODE_BRANCH_COUNT + i] = NULL;
 
 		new_node->branch_tag[i] =
-			node->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT + i];
+				node->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT + i];
 	}
 
 	new_node->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1] =
-		node->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1];
+			node->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1];
 
 	return new_node;
 }
@@ -232,7 +232,7 @@ sLinkedListNode* hash_table_get_values(sHashTableNode *root, int key) {
 	while (!hash_table_is_leaf(current)) {
 		int index = 0;
 		for (; index < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-			++index) {
+				++index) {
 			if (key < current->branch_tag[index]) {
 				break;
 			}
@@ -243,13 +243,13 @@ sLinkedListNode* hash_table_get_values(sHashTableNode *root, int key) {
 
 	int index = 0;
 	for (; index < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-		++index) {
+			++index) {
 		if (key < current->branch_tag[index]) {
 			break;
 		}
 	}
 
-	sHashTableEnd *end = (sHashTableEnd*)current->branches[index];
+	sHashTableEnd *end = (sHashTableEnd*) current->branches[index];
 	if (end->key != key) {
 		return NULL;
 	}
@@ -270,23 +270,23 @@ sHashTableNode* hash_table_remove(sHashTableNode *root, int key, void *value) {
 	while (!hash_table_is_leaf(current)) {
 		int index = 0;
 		for (; index < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-			index++) {
+				index++) {
 			if (current->branch_tag[index] > key) {
 				break;
 			}
 		}
-		current = (sHashTableNode*)current->branches[index];
+		current = (sHashTableNode*) current->branches[index];
 	}
 
 	int index = 0;
 	for (; index < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-		index++) {
+			index++) {
 		if (current->branch_tag[index] > key) {
 			break;
 		}
 	}
 
-	sHashTableEnd *end = (sHashTableEnd*)current->branches[index];
+	sHashTableEnd *end = (sHashTableEnd*) current->branches[index];
 
 	if (end->key != key) {
 		return root;
@@ -295,7 +295,8 @@ sHashTableNode* hash_table_remove(sHashTableNode *root, int key, void *value) {
 	end->values = linked_list_remove(end->values, value);
 	if (end->values == NULL) {
 		for (int i = index;
-			i < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1; i++) {
+				i < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
+				i++) {
 			current->branches[i] = current->branches[i + 1];
 			if (i == 0) {
 				continue;
@@ -307,7 +308,7 @@ sHashTableNode* hash_table_remove(sHashTableNode *root, int key, void *value) {
 		current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]--;
 
 		while (hash_table_has_too_few_branches(current)
-			&& !hash_table_is_root(current)) {
+				&& !hash_table_is_root(current)) {
 			if (hash_table_left_rotate(current)) {
 				break;
 			}
@@ -323,7 +324,7 @@ sHashTableNode* hash_table_remove(sHashTableNode *root, int key, void *value) {
 		}
 
 		if (hash_table_has_too_few_branches(current)
-			&& hash_table_is_root(current)) {
+				&& hash_table_is_root(current)) {
 			root = current->branches[0];
 			if (hash_table_is_leaf(root)) {
 				root->parent = NULL;
@@ -345,23 +346,23 @@ sHashTableNode* hash_table_remove_key(sHashTableNode *root, int key) {
 	while (!hash_table_is_leaf(current)) {
 		int index = 0;
 		for (; index < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-			index++) {
+				index++) {
 			if (current->branch_tag[index] > key) {
 				break;
 			}
 		}
-		current = (sHashTableNode*)current->branches[index];
+		current = (sHashTableNode*) current->branches[index];
 	}
 
 	int index = 0;
 	for (; index < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-		index++) {
+			index++) {
 		if (current->branch_tag[index] > key) {
 			break;
 		}
 	}
 
-	sHashTableEnd *end = (sHashTableEnd*)current->branches[index];
+	sHashTableEnd *end = (sHashTableEnd*) current->branches[index];
 
 	if (end->key != key) {
 		return root;
@@ -369,7 +370,7 @@ sHashTableNode* hash_table_remove_key(sHashTableNode *root, int key) {
 
 	linked_list_clear(end->values);
 	for (int i = index;
-		i < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1; i++) {
+			i < current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1; i++) {
 		current->branches[i] = current->branches[i + 1];
 		if (i == 0) {
 			continue;
@@ -381,7 +382,7 @@ sHashTableNode* hash_table_remove_key(sHashTableNode *root, int key) {
 	current->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]--;
 
 	while (hash_table_has_too_few_branches(current)
-		&& !hash_table_is_root(current)) {
+			&& !hash_table_is_root(current)) {
 		if (hash_table_left_rotate(current)) {
 			break;
 		}
@@ -397,7 +398,7 @@ sHashTableNode* hash_table_remove_key(sHashTableNode *root, int key) {
 	}
 
 	if (hash_table_has_too_few_branches(current)
-		&& hash_table_is_root(current)) {
+			&& hash_table_is_root(current)) {
 		root = current->branches[0];
 		if (hash_table_is_leaf(root)) {
 			root->parent = NULL;
@@ -413,13 +414,14 @@ int hash_table_left_rotate(sHashTableNode *node) {
 	sHashTableNode *parent = HASH_TABLE_NODE_GET_PARENT(node);
 
 	if (node
-		== parent->branches[parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1]) {
+			== parent->branches[parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]
+					- 1]) {
 		return FALSE;
 	}
 
 	int index = 0;
 	for (; index < parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1;
-		index++) {
+			index++) {
 		if (parent->branches[index] == node) {
 			break;
 		}
@@ -432,14 +434,14 @@ int hash_table_left_rotate(sHashTableNode *node) {
 	}
 
 	node->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 2] =
-		parent->branch_tag[index - 1];
+			parent->branch_tag[index - 1];
 	node->branches[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1] = brother->branches[0];
 	parent->branch_tag[index - 1] = brother->branch_tag[0];
 
 	--brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
 
 	for (int i = 0; i < brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
-		i++) {
+			i++) {
 		brother->branches[i] = brother->branches[i + 1];
 		if (i < brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT] - 1) {
 			brother->branch_tag[i] = brother->branch_tag[i + 1];
@@ -484,10 +486,10 @@ int hash_table_right_rotate(sHashTableNode *node) {
 	--brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
 
 	node->branches[0] =
-		brother->branches[brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]];
+			brother->branches[brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]];
 	parent->branch_tag[index] =
-		brother->branch_tag[brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]
-			- 1];
+			brother->branch_tag[brother->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]
+					- 1];
 
 	return TRUE;
 }
@@ -495,21 +497,21 @@ int hash_table_right_rotate(sHashTableNode *node) {
 int hash_table_merge(sHashTableNode *node, sHashTableNode *parent) {
 	if (node == parent->branches[0]) {
 		node->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 2] =
-			parent->branch_tag[0];
+				parent->branch_tag[0];
 		sHashTableNode *brother = parent->branches[1];
 		for (int i = HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1;
-			i < 2 * HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1; i++) {
+				i < 2 * HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1; i++) {
 			node->branches[i] = brother->branches[i
-				- HASH_TABLE_NEW_NODE_BRANCH_COUNT + 1];
+					- HASH_TABLE_NEW_NODE_BRANCH_COUNT + 1];
 			if (i < 2 * HASH_TABLE_NEW_NODE_BRANCH_COUNT - 2) {
 				node->branch_tag[i] = brother->branch_tag[i
-					- HASH_TABLE_NEW_NODE_BRANCH_COUNT + 1];
+						- HASH_TABLE_NEW_NODE_BRANCH_COUNT + 1];
 			}
 		}
 
 		--parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
 		for (int i = 1; i < parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
-			i++) {
+				i++) {
 			parent->branches[i] = parent->branches[i + 1];
 			parent->branch_tag[i - 1] = parent->branch_tag[i];
 		}
@@ -527,30 +529,30 @@ int hash_table_merge(sHashTableNode *node, sHashTableNode *parent) {
 	--index;
 	sHashTableNode *brother = parent->branches[index];
 	brother->branch_tag[HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1] =
-		parent->branch_tag[index];
+			parent->branch_tag[index];
 	for (int i = HASH_TABLE_NEW_NODE_BRANCH_COUNT;
-		i < 2 * HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1; i++) {
+			i < 2 * HASH_TABLE_NEW_NODE_BRANCH_COUNT - 1; i++) {
 		brother->branches[i] = node->branches[i
-			- HASH_TABLE_NEW_NODE_BRANCH_COUNT];
+				- HASH_TABLE_NEW_NODE_BRANCH_COUNT];
 		if (i < 2 * HASH_TABLE_NEW_NODE_BRANCH_COUNT - 2) {
 			brother->branch_tag[i] = node->branch_tag[i
-				- HASH_TABLE_NEW_NODE_BRANCH_COUNT];
+					- HASH_TABLE_NEW_NODE_BRANCH_COUNT];
 		}
 	}
 
 	--parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
-	for (int i = index;
-		i < parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]; i++) {
+	for (int i = index; i < parent->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
+			i++) {
 		parent->branch_tag[i] = parent->branch_tag[i + 1];
 		parent->branches[i + 1] = parent->branches[i + 2];
 	}
 
-//	return TRUE;
+	return TRUE;
 }
 
 int hash_table_will_have_too_few_branches(sHashTableNode *node) {
 	return node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT]
-		== HASH_TABLE_NEW_NODE_BRANCH_COUNT;
+			== HASH_TABLE_NEW_NODE_BRANCH_COUNT;
 }
 
 sHashTableNode* hash_table_clear(sHashTableNode *root) {
@@ -563,14 +565,14 @@ sHashTableNode* hash_table_clear(sHashTableNode *root) {
 		sHashTableNode *node = linked_list_first(list);
 		if (hash_table_is_leaf(node)) {
 			for (int i = 0; i < node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
-				i++) {
-				sHashTableEnd *end = (sHashTableEnd*)node->branches[i];
+					i++) {
+				sHashTableEnd *end = (sHashTableEnd*) node->branches[i];
 				linked_list_clear(end->values);
 				free(end);
 			}
 		} else {
 			for (int i = 0; i < node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
-				i++) {
+					i++) {
 				linked_list_append(list, node->branches[i]);
 			}
 		}
@@ -590,13 +592,13 @@ void hash_table_test(sHashTableNode *root) {
 		sHashTableNode *node = linked_list_first(list);
 		if (hash_table_is_leaf(node)) {
 			for (int i = 0; i < node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
-				i++) {
-				sHashTableEnd *end = (sHashTableEnd*)node->branches[i];
+					i++) {
+				sHashTableEnd *end = (sHashTableEnd*) node->branches[i];
 				linked_list_test(end->values);
 			}
 		} else {
 			for (int i = 0; i < node->branch_tag[HASH_TABLE_NODE_BRANCH_COUNT];
-				i++) {
+					i++) {
 				linked_list_append(list, node->branches[i]);
 			}
 		}

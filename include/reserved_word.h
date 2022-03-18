@@ -256,12 +256,6 @@ extern const sReservedWord rw_dot;
 #define RW_ID_MEMBER (82)
 extern const sReservedWord rw_member;
 
-#define RW_ID_QUOTATION_MARK (83)
-extern const sReservedWord rw_quotation_mark;
-
-#define RW_ID_SINGLE_QUOTATION_MARK (84)
-extern const sReservedWord rw_single_quotation_mark;
-
 extern const sReservedWord* const reserved_words[];
 
 #endif /* INCLUDE_RESERVED_WORD_H_ */

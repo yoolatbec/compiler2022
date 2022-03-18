@@ -332,14 +332,6 @@ const sReservedWord rw_member =
 	{ "->",
 	RW_ID_MEMBER };
 
-const sReservedWord rw_quotation_mark =
-	{ "\"",
-	RW_ID_QUOTATION_MARK };
-
-const sReservedWord rw_single_quotation_mark =
-	{ "\'",
-	RW_ID_SINGLE_QUOTATION_MARK };
-
 const sReservedWord *const reserved_words[] =
 	{
 		&rw_char,
@@ -423,6 +415,4 @@ const sReservedWord *const reserved_words[] =
 		&rw_semicolon,
 		&rw_dot,
 		&rw_member,
-		&rw_quotation_mark,
-		&rw_single_quotation_mark,
 		NULL };
