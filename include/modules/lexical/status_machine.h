@@ -11,15 +11,14 @@
 #include <errcode.h>
 #include <modules/lexical/acceptance_func.h>
 #include <reserved_word.h>
+#include <modules/lexical/by_effect_func.h>
 
 struct sSMEdge;
-
-typedef void (*BY_EFFECT)(void*);
 
 typedef struct sSMNode {
 	struct sSMEdge *first_edge;
 	int node_attr;
-	BY_EFFECT action;
+	BY_EFFECT_FUNC action;
 } sSMNode;
 
 typedef struct sSMEdge {
@@ -27,7 +26,7 @@ typedef struct sSMEdge {
 	struct sSMEdge *next;
 	ACC_FUNC acc_func;
 	char *data;
-	BY_EFFECT by_effect;
+	BY_EFFECT_FUNC by_effect;
 } sSMEdge;
 
 int sm_add_reserved_word(sSMNode*, const sReservedWord*);

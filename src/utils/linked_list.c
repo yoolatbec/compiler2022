@@ -8,10 +8,6 @@
 #include <utils/linked_list.h>
 #include <stdlib.h>
 
-#ifdef DEBUG
-#include <stdio.h>
-#endif
-
 #define FALSE (0)
 #define TRUE (!FALSE)
 
@@ -281,18 +277,3 @@ int linked_list_contains(sLinkedListNode *head, void *data) {
 
 	return FALSE;
 }
-
-#ifdef DEBUG
-
-void linked_list_test(sLinkedListNode *head) {
-	sLinkedListNode *current = head;
-	printf("%d ", (int)current->data);
-	current = current->next;
-	while (current != NULL && current != head) {
-		printf("%d ", (int)current->data);
-		current = current->next;
-	}
-	putchar('\n');
-}
-
-#endif

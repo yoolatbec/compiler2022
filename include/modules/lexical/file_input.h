@@ -10,6 +10,7 @@
 
 #include <errcode.h>
 #include <stdio.h>
+#include <modules/mm/buffer.h>
 
 #define INPUT_BUFFER_SIZE (4096)
 

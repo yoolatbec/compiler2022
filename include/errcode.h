@@ -17,5 +17,7 @@
 #define FILE_INPUT_SOURCE_CLOSED (6)
 #define CAN_NOT_OPEN_FILE (7)
 
+#define LEXICAL_INVALID_INPUT (20)
+
 
 #endif /* INCLUDE_ERRCODE_H_ */

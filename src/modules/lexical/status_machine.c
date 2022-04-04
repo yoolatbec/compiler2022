@@ -59,10 +59,12 @@ int sm_add_reserved_word(sSMNode *head, const sReservedWord *kw) {
 		new_edge->data = (char*)(kw->value[kw_cursor]);
 		new_edge->target_node = new_node;
 		new_edge->next = current_node->first_edge;
+		new_edge->by_effect = NULL;
 		current_node->first_edge = new_edge;
 
 		current_node = new_node;
 		new_node->first_edge = NULL;
+		new_node->action = NULL;
 		new_node->node_attr = 0;
 		++kw_cursor;
 
