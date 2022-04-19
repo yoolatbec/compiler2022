@@ -19,7 +19,7 @@ struct sLinkedListNode {
 
 sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 	if (head == NULL) {
-		head = (sLinkedListNode*)malloc(sizeof(sLinkedListNode));
+		head = (sLinkedListNode*) malloc(sizeof(sLinkedListNode));
 		head->data = data;
 		head->next = NULL;
 		head->prev = NULL;
@@ -27,8 +27,8 @@ sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 		return head;
 	}
 
-	sLinkedListNode *new_node = (sLinkedListNode*)malloc(
-		sizeof(sLinkedListNode));
+	sLinkedListNode *new_node = (sLinkedListNode*) malloc(
+			sizeof(sLinkedListNode));
 	new_node->data = data;
 	new_node->next = head;
 	new_node->prev = head->prev;
@@ -46,7 +46,7 @@ sLinkedListNode* linked_list_append(sLinkedListNode *head, void *data) {
 
 sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
 	if (head == NULL) {
-		head = (sLinkedListNode*)malloc(sizeof(sLinkedListNode));
+		head = (sLinkedListNode*) malloc(sizeof(sLinkedListNode));
 		head->data = data;
 		head->next = NULL;
 		head->prev = NULL;
@@ -54,8 +54,8 @@ sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
 		return head;
 	}
 
-	sLinkedListNode *new_node = (sLinkedListNode*)malloc(
-		sizeof(sLinkedListNode));
+	sLinkedListNode *new_node = (sLinkedListNode*) malloc(
+			sizeof(sLinkedListNode));
 	new_node->data = data;
 	new_node->next = head;
 	new_node->prev = head->prev;
@@ -72,7 +72,7 @@ sLinkedListNode* linked_list_prepend(sLinkedListNode *head, void *data) {
 }
 
 sLinkedListNode* linked_list_insert(sLinkedListNode *head, void *data,
-	size_t position) {
+		size_t position) {
 	if (head == NULL) {
 		return linked_list_append(head, data);
 	}
@@ -225,6 +225,7 @@ void* linked_list_nth(sLinkedListNode *head, size_t position) {
 	sLinkedListNode *current = head;
 	while (position > 0) {
 		current = current->next;
+		--position;
 	}
 
 	return current->data;
@@ -267,13 +268,13 @@ int linked_list_contains(sLinkedListNode *head, void *data) {
 	}
 
 	sLinkedListNode *current = head;
-	while (current->next != NULL) {
+	do {
 		if (current->data == data) {
 			return TRUE;
 		}
 
 		current = current->next;
-	}
+	} while (current != head);
 
 	return FALSE;
 }

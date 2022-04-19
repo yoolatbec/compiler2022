@@ -256,6 +256,41 @@ extern const sReservedWord rw_dot;
 #define RW_ID_MEMBER (82)
 extern const sReservedWord rw_member;
 
-extern const sReservedWord* const reserved_words[];
+#define PRIM_ID_IDENTIFIER (100)
+
+#define PRIM_ID_INTEGER (101)
+#define PRIM_ID_UINT (102)
+#define PRIM_ID_LONG (103)
+#define PRIM_ID_ULONG (104)
+
+#define PRIM_ID_OCTAL_INTEGER (105)
+#define PRIM_ID_OCTAL_UINT (106)
+#define PRIM_ID_OCTAL_LONG (107)
+#define PRIM_ID_OCTAL_ULONG (108)
+
+#define PRIM_ID_HEXADECIMAL_INTEGER (109)
+#define PRIM_ID_HEXADECIMAL_UINT (110)
+#define PRIM_ID_HEXADECIMAL_LONG (111)
+#define PRIM_ID_HEXADECIMAL_ULONG (112)
+
+#define PRIM_ID_BINARY_INTEGER (113)
+#define PRIM_ID_BINARY_UINT (114)
+#define PRIM_ID_BINARY_LONG (115)
+#define PRIM_ID_BINARY_ULONG (116)
+
+#define PRIM_ID_CHAR (117)
+
+#define PRIM_ID_STRING (120)
+
+#define PRIM_ID_FLOAT (121)
+#define PRIM_ID_DOUBLE (122)
+
+#define PRIM_ID_ZERO (125)
+
+#define PRIM_ID_BLANK_IGNORE (130)
+
+#define INPUT_SRC_END (1024)
+
+extern const sReservedWord *const reserved_words[];
 
 #endif /* INCLUDE_RESERVED_WORD_H_ */

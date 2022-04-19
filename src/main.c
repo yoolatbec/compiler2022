@@ -5,13 +5,12 @@
  *      Author: yoolatbec
  */
 //#define DEBUG
-
-//#include <utils/hash_table.h>
 #include <utils/linked_list.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <modules/lexical/sm_util_func.h>
 #include <modules/lexical/scan.h>
+#include <modules/grammar/deduce.h>
 
 int main(int argc, char **argv) {
 
@@ -46,7 +45,7 @@ int main(int argc, char **argv) {
 	fclose(file);
 	printf("%ld\n", size);
 #else
-	char* str = "a";
+	char* str = "1*(1+1)";
 	size_t size = strlen(str);
 #endif
 
@@ -59,13 +58,14 @@ int main(int argc, char **argv) {
 
 	scan(buffer, start_node, &primitives, &values, status);
 
-	while (primitives != NULL) {
-		sPrimitive *primitive = (sPrimitive*) linked_list_first(primitives);
-		printf("type is %d\n", primitive_get_type(primitive));
-		primitives = linked_list_remove_first(primitives);
-	}
+//	while (primitives != NULL) {
+//		sPrimitive *primitive = (sPrimitive*) linked_list_first(primitives);
+//		printf("type is %d\n", primitive_get_type(primitive));
+//		primitives = linked_list_remove_first(primitives);
+//	}
 
-
+	sGrammar *start_grammar = init_all_grammar();
+	deduce(start_grammar, &primitives);
 
 	return 0;
 }
