@@ -58,12 +58,6 @@ int main(int argc, char **argv) {
 
 	scan(buffer, start_node, &primitives, &values, status);
 
-//	while (primitives != NULL) {
-//		sPrimitive *primitive = (sPrimitive*) linked_list_first(primitives);
-//		printf("type is %d\n", primitive_get_type(primitive));
-//		primitives = linked_list_remove_first(primitives);
-//	}
-
 	sGrammar *start_grammar = init_all_grammar();
 	deduce(start_grammar, &primitives);
 
