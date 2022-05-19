@@ -12,6 +12,7 @@ struct sGrammarNode {
 	sGrammarNode *next;
 	int type;
 	void *value;
+	GRAMMAR_NODE_FUNC func;
 };
 
 /**
@@ -36,12 +37,29 @@ sGrammarNode* grammar_node_new(int type, void *value) {
 	node->type = type;
 	node->value = value;
 	node->next = NULL;
+	node->func = NULL;
 
 	return node;
 }
 
 sGrammarNode* grammar_node_get_next(sGrammarNode *node) {
 	return node->next;
+}
+
+int grammar_node_is_function_node(sGrammarNode *node) {
+	return node->func != NULL && node->type == 0 && node->value == NULL;
+}
+
+int grammar_node_has_function(sGrammarNode *node) {
+	return node->func != NULL;
+}
+
+void grammar_node_function(sGrammarNode *node, void *data) {
+	node->func(data);
+}
+
+void grammar_node_set_function(sGrammarNode *node, GRAMMAR_NODE_FUNC func) {
+	node->func = func;
 }
 
 int grammar_node_get_type(sGrammarNode *node) {
@@ -98,10 +116,11 @@ void grammar_body_append(sGrammarBody *body, sGrammarNode *node) {
 					size_t size = linked_list_size(firsts);
 					for (int i = 0; i < size; ++i) {
 						int type = linked_list_nth(firsts, i);
-						if (linked_list_contains(body->firsts, (void*)type)) {
+						if (linked_list_contains(body->firsts, (void*) type)) {
 							continue;
 						}
-						body->firsts = linked_list_append(body->firsts, (void*)type);
+						body->firsts = linked_list_append(body->firsts,
+								(void*) type);
 					}
 					b = b->next_peer;
 				}

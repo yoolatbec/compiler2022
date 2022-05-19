@@ -18,8 +18,14 @@ typedef struct sGrammar sGrammar;
 typedef struct sGrammarBody sGrammarBody;
 typedef struct sGrammarNode sGrammarNode;
 
+typedef void (*GRAMMAR_NODE_FUNC)(void*);
+
 sGrammarNode* grammar_node_new(int, void*);
 sGrammarNode* grammar_node_get_next(sGrammarNode*);
+int grammar_node_is_function_node(sGrammarNode*);
+int grammar_node_has_function(sGrammarNode*);
+void grammar_node_function(sGrammarNode*, void*);
+void grammar_node_set_function(sGrammarNode*, GRAMMAR_NODE_FUNC);
 int grammar_node_get_type(sGrammarNode*);
 void* grammar_node_get_value(sGrammarNode*);
 

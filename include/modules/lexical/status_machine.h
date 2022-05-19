@@ -12,6 +12,7 @@
 #include <modules/lexical/acceptance_func.h>
 #include <reserved_word.h>
 #include <modules/lexical/by_effect_func.h>
+#include <modules/grammar/grammar_tree.h>
 
 struct sSMEdge;
 
@@ -19,6 +20,7 @@ typedef struct sSMNode {
 	struct sSMEdge *first_edge;
 	int node_attr;
 	BY_EFFECT_FUNC action;
+	GRAMMAR_TREE_BUILD_FUNC build;
 } sSMNode;
 
 typedef struct sSMEdge {

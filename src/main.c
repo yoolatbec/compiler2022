@@ -4,13 +4,15 @@
  *  Created on: 2022年2月24日
  *      Author: yoolatbec
  */
-//#define DEBUG
+#define DEBUG
 #include <utils/linked_list.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <modules/lexical/sm_util_func.h>
 #include <modules/lexical/scan.h>
 #include <modules/grammar/deduce.h>
+#include <modules/ir/ir.h>
 
 int main(int argc, char **argv) {
 
@@ -45,7 +47,7 @@ int main(int argc, char **argv) {
 	fclose(file);
 	printf("%ld\n", size);
 #else
-	char* str = "1*(1+1)";
+	char *str = "1*(1+1)+1";
 	size_t size = strlen(str);
 #endif
 
@@ -59,7 +61,9 @@ int main(int argc, char **argv) {
 	scan(buffer, start_node, &primitives, &values, status);
 
 	sGrammar *start_grammar = init_all_grammar();
-	deduce(start_grammar, &primitives);
+	sLinkedListNode *irs = deduce(start_grammar, &primitives);
+
+	print_IRs(irs, 1 << 12);
 
 	return 0;
 }

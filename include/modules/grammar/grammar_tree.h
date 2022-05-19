@@ -10,6 +10,19 @@
 
 typedef struct sGrammarTreeNode sGrammarTreeNode;
 
+typedef void (*GRAMMAR_TREE_BUILD_FUNC)(sGrammarTreeNode*, void*);
+
+#define GRAMMAR_TREE_BUILD_TYPE_CHILD (0)
+#define GRAMMAR_TREE_BUILD_TYPE_PEER (1)
+
+typedef struct sGrammarTreeBuildInfo {
+	int build_type;
+	int node_type;
+	int hashcode;
+	void* value0;
+	void* value1;
+} sGrammarTreeBuildInfo;
+
 sGrammarTreeNode* grammar_tree_node_new();
 void grammar_tree_destroy(sGrammarTreeNode*);
 void grammar_tree_node_destroy(sGrammarTreeNode*);

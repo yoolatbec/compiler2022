@@ -9,6 +9,9 @@
 #include <modules/lexical/primitive.h>
 #include <stdio.h>
 #include <modules/grammar/by_func.h>
+#include <modules/grammar/grammar_tree.h>
+#include <modules/ir/ir_func.h>
+#include <stdlib.h>
 
 sGrammar* init_all_grammar() {
 	sGrammar *term_grammar = grammar_construct_term();
@@ -18,7 +21,8 @@ sGrammar* init_all_grammar() {
 	sGrammar *l0a = grammar_construct_l0a(l1a, l0b);
 
 	sGrammarBody *body = grammar_body_new();
-	grammar_body_add_by_func(body, using_term__parenthesis_left_l0a_parenthesis_right);
+	grammar_body_add_by_func(body,
+			using_term__parenthesis_left_l0a_parenthesis_right);
 	sGrammarNode *n1 = grammar_node_new(RW_ID_PARENTHESIS_LEFT, NULL);
 	sGrammarNode *n2 = grammar_node_new(0, l0a);
 	sGrammarNode *n3 = grammar_node_new(RW_ID_PARENTHESIS_RIGHT, NULL);
@@ -30,21 +34,23 @@ sGrammar* init_all_grammar() {
 	return l0a;
 }
 
-void deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
+sLinkedListNode* deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 	sLinkedListNode *grammar_node_stack = NULL;
 	sGrammar *current_grammar = NULL;
 	sGrammarNode *current_grammar_node = NULL;
 	sPrimitive *current_primitive = linked_list_first(*primitives);
 	*primitives = linked_list_remove_first(*primitives);
+	sGrammarTreeNode *root_node = grammar_tree_node_new();
+	sGrammarTreeNode *current_node = root_node;
+	sContext *context = (sContext*) malloc(sizeof(sContext));
+	context->IRs = NULL;
+	context->oprands = NULL;
+	context->ops = NULL;
+	context->label_base = 1 << 12;
+	context->next_assign_label = 1 << 12;
 
-	while (*primitives != NULL) {
+	while (*primitives != NULL || grammar_node_stack != NULL) {
 		int type = primitive_get_type(current_primitive);
-		if (type == INPUT_SRC_END) {
-			if (grammar_node_stack != NULL) {
-				puts("unexpected end of src.");
-				break;
-			}
-		}
 
 		if (current_grammar_node == NULL) {
 			sGrammarBody *body = NULL;
@@ -83,8 +89,18 @@ void deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 				grammar_body_by_func(body);
 			}
 		} else {
-			if (grammar_node_get_type(current_grammar_node) != 0) {
+			if (grammar_node_is_function_node(current_grammar_node)) {
+				grammar_node_function(current_grammar_node, context);
+				current_grammar_node = grammar_node_get_next(
+						current_grammar_node);
+			} else if (grammar_node_get_type(current_grammar_node) != 0) {
 				if (grammar_node_get_type(current_grammar_node) == type) {
+					if (grammar_node_has_function(current_grammar_node)) {
+						context->parameter = grammar_node_get_type(
+								current_grammar_node);
+						grammar_node_function(current_grammar_node, context);
+					}
+
 					current_grammar_node = grammar_node_get_next(
 							current_grammar_node);
 					current_primitive = linked_list_first(*primitives);
@@ -107,5 +123,7 @@ void deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 			}
 		}
 	}
+
+	return context->IRs;
 }
 

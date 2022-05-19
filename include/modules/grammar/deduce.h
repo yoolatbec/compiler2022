@@ -13,6 +13,6 @@
 
 sGrammar* init_all_grammar();
 
-void deduce(sGrammar* start_grammar, sLinkedListNode** primitives);
+sLinkedListNode* deduce(sGrammar* start_grammar, sLinkedListNode** primitives);
 
 #endif /* INCLUDE_MODULES_GRAMMAR_DEDUCE_H_ */
