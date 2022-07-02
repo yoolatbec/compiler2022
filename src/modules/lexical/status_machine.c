@@ -12,6 +12,9 @@
 #define FALSE (0)
 #define TRUE (!FALSE)
 
+/*
+ * 用于确定一条边的接受函数的类型
+ */
 #define ACCEPT_SINGLE_CHAR(edge, c) (edge->acc_func == single_char_acc_func && c == (char)edge->data)
 #define ACCEPT_LOWER_CASE_CHAR(edge) (edge->acc_func == lower_case_char_acc_func)
 #define ACCEPT_HIGHER_CASE_CHAR(edge) (edge->acc_func == higher_case_char_acc_func)
@@ -21,9 +24,9 @@
 #define ACCEPT_IDENTIFIER_HEAD_CHAR(edge) (edge->acc_func == identifier_head_char_acc_func)
 #define ACCEPT_ANY_CHAR(edge) (edge->acc_func == any_char_acc_func)
 
-#define RULE_TREE_NODE_ATTR_ONE_OR_MORE (1 << 0)
-#define RULE_TREE_NODE_ATTR_ZERO_OR_MORE (1 << 1)
-
+/*
+ * 添加识别保留字的路径
+ */
 int sm_add_reserved_word(sSMNode *head, const sReservedWord *kw) {
 	if (head == NULL || kw == NULL) {
 		return INVALID_ARGUMENT;
@@ -75,6 +78,9 @@ int sm_add_reserved_word(sSMNode *head, const sReservedWord *kw) {
 	return SUCCESS;
 }
 
+/*
+ * 用于合并有限状态机
+ */
 int sm_merge(sSMNode *head, sSMNode *another_head) {
 	if (head == NULL || another_head == NULL) {
 		return INVALID_ARGUMENT;

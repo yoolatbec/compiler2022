@@ -16,6 +16,9 @@
 
 typedef struct sScanStatus sScanStatus;
 
+/*
+ * 对源文件进行扫描以生成词法单元序列
+ */
 int scan(sBuffer *input_buffer, sSMNode *sm_root,
 		sLinkedListNode **primitive_output, sLinkedListNode **primitive_values,
 		sScanStatus *scan_status);

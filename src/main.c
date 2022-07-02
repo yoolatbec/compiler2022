@@ -14,6 +14,8 @@
 #include <modules/grammar/deduce.h>
 #include <modules/ir/ir.h>
 
+#include <modules/code_gen/code_gen.h>
+
 int main(int argc, char **argv) {
 
 #ifndef DEBUG
@@ -47,7 +49,18 @@ int main(int argc, char **argv) {
 	fclose(file);
 	printf("%ld\n", size);
 #else
-	char *str = "1*(1+1)+1";
+	char *str = "int a;"
+			"int b;"
+			"a = 200;"
+			"b = a * 5 + 100;"
+			"if ( a > 100) {"
+			"a = 100;"
+			"} else {"
+			"b = a;"
+			"}"
+			"while(a > 10){"
+			"a = a - 10;"
+			"}";
 	size_t size = strlen(str);
 #endif
 
@@ -60,10 +73,19 @@ int main(int argc, char **argv) {
 
 	scan(buffer, start_node, &primitives, &values, status);
 
+	int s = linked_list_size(primitives);
+	for (int i = 0; i < s; i++) {
+		sPrimitive *p = linked_list_nth(primitives, i);
+		printf("%d: type = %d\n", i + 1, primitive_get_type(p));
+
+	}
+
 	sGrammar *start_grammar = init_all_grammar();
 	sLinkedListNode *irs = deduce(start_grammar, &primitives);
 
 	print_IRs(irs, 1 << 12);
+
+	code_gen(irs, "./test.s");
 
 	return 0;
 }

@@ -8,27 +8,36 @@
 #include <modules/grammar/grammar.h>
 #include <stdlib.h>
 
+/*
+ * 产生式中的节点，可以是符号或动作
+ * 如果一个节点表示终结符号，则type表示对应的类型（见reserved_word.h）
+ * 如果一个节点表示非终结符号，则type为0，value指示以该非终结符号为左部的
+ * 产生式的集合
+ * 如果一个节点为动作节点，则type为0且value为NULL
+ */
 struct sGrammarNode {
-	sGrammarNode *next;
+	sGrammarNode *next;  //下一个节点
 	int type;
 	void *value;
-	GRAMMAR_NODE_FUNC func;
+	GRAMMAR_NODE_FUNC func;  //语法分析动作
 };
 
-/**
- * If first is 0, then look for the first node for first;
+/*
+ * 表示一条产生式
  */
-
 struct sGrammarBody {
-	sGrammarNode *first_node;
-	sGrammarBody *next_peer;
-	void (*by_func)();
-	sLinkedListNode *firsts;
+	sGrammarNode *first_node;  //右部第一个节点
+	sGrammarBody *next_peer;  //左部相同的下一条产生式
+	void (*by_func)();  //辅助函数
+	sLinkedListNode *firsts;  //First集
 };
 
+/*
+ * 表示左部相同的所有产生式
+ */
 struct sGrammar {
-	sGrammarBody *first_body;
-	const char *name;
+	sGrammarBody *first_body;  //第一条产生式
+	const char *name;  //左部名称
 };
 
 sGrammarNode* grammar_node_new(int type, void *value) {
@@ -99,13 +108,20 @@ void grammar_body_add_by_func(sGrammarBody *body, void (*by_func)()) {
 	body->by_func = by_func;
 }
 
+/*
+ * 用于将一个节点添加到产生式中
+ * 在必要时计算First集
+ */
 void grammar_body_append(sGrammarBody *body, sGrammarNode *node) {
 	if (body->first_node == NULL) {
+		//如果为第一个节点
 		body->first_node = node;
 		if (grammar_node_get_type(node) != 0) {
+			//如果节点符号为终结符号，将其添加到First集中
 			body->firsts = linked_list_append(body->firsts,
 					(void*) grammar_node_get_type(node));
 		} else {
+			//如果节点符号为非终结符号，则添加对应文法的First集中的元素
 			sGrammar *grammar = grammar_node_get_value(node);
 			if (grammar == NULL) {
 				body->firsts = linked_list_append(body->firsts, NULL);

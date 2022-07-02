@@ -40,9 +40,9 @@ void* buffer_write(sBuffer *buffer, void *data, size_t size) {
 
 	memcpy(&((char*) buffer->data)[buffer->cursor], data, size);
 	buffer->cursor += size;
-	((char*)buffer->data)[buffer->cursor] = '\0';
+	((char*) buffer->data)[buffer->cursor] = '\0';
 
-	return &((char*)buffer->data)[buffer->cursor - size];
+	return &((char*) buffer->data)[buffer->cursor - size];
 }
 
 void* buffer_write_byte(sBuffer *buffer, char data) {
@@ -52,17 +52,23 @@ void* buffer_write_byte(sBuffer *buffer, char data) {
 
 	((char*) buffer->data)[buffer->cursor] = data;
 	++buffer->cursor;
-	((char*)buffer->data)[buffer->cursor] = '\0';
+	((char*) buffer->data)[buffer->cursor] = '\0';
 
-	return &((char*)buffer->data)[buffer->cursor - 1];
+	return &((char*) buffer->data)[buffer->cursor - 1];
 }
 
-void* buffer_read(sBuffer *buffer, size_t start) {
-	if (start >= buffer->size) {
-		return NULL;
+void buffer_read(sBuffer *buffer, size_t start, void *data) {
+	if (start >= buffer->cursor) {
+		return;
 	}
 
-	return (char*) buffer->data + start;
+	if (data == NULL) {
+		return;
+	}
+
+	for (size_t s = start; s < buffer->cursor; ++s) {
+		((char*) data)[s - start] = ((char*)buffer->data)[s];
+	}
 }
 
 void buffer_clear(sBuffer *buffer) {
@@ -79,4 +85,12 @@ size_t buffer_used_space(sBuffer *buffer) {
 
 void buffer_destroy(sBuffer *buffer) {
 	free(buffer);
+}
+
+size_t buffer_available(sBuffer *buffer) {
+	return buffer->size - buffer->cursor;
+}
+
+void* buffer_head(sBuffer* buffer){
+	return buffer->data;
 }

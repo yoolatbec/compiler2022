@@ -14,40 +14,47 @@
 #include <stdlib.h>
 
 sGrammar* init_all_grammar() {
-	sGrammar *term_grammar = grammar_construct_term();
-	sGrammar *l1b = grammar_construct_l1b(term_grammar);
-	sGrammar *l1a = grammar_construct_l1a(l1b, term_grammar);
-	sGrammar *l0b = grammar_construct_l0b(l1a);
-	sGrammar *l0a = grammar_construct_l0a(l1a, l0b);
+	sGrammar *expression = grammar_new("expression");
+	sGrammar *as = grammar_new("additive statement");
+	sGrammar *term = grammar_construct_term(as);
+	sGrammar *ms_ = grammar_construct_multiplicative_statement_(term);
+	sGrammar *ms = grammar_construct_multiplicative_statement(term, ms_);
+	sGrammar *as_ = grammar_construct_additive_statement_(ms);
+	grammar_construct_additive_statement(&as, ms, as_);
+	sGrammar *relative_operator = grammar_construct_relative_operator();
+	sGrammar *boolean_statement = grammar_construct_boolean_statement(as,
+			relative_operator);
+	sGrammar *while_statement = grammar_construct_while_statement(
+			boolean_statement, expression);
+	sGrammar *else_statement = grammar_construct_else_statement(expression);
+	sGrammar *if_statement = grammar_construct_if_statement(boolean_statement,
+			expression, else_statement);
+	sGrammar *assignment = grammar_construct_assignment(as);
+	sGrammar *definition = grammar_construct_definition();
+	grammar_construct_expressions(&expression, definition, assignment,
+			if_statement, while_statement);
 
-	sGrammarBody *body = grammar_body_new();
-	grammar_body_add_by_func(body,
-			using_term__parenthesis_left_l0a_parenthesis_right);
-	sGrammarNode *n1 = grammar_node_new(RW_ID_PARENTHESIS_LEFT, NULL);
-	sGrammarNode *n2 = grammar_node_new(0, l0a);
-	sGrammarNode *n3 = grammar_node_new(RW_ID_PARENTHESIS_RIGHT, NULL);
-	grammar_body_append(body, n1);
-	grammar_body_append(body, n2);
-	grammar_body_append(body, n3);
-	grammar_add(term_grammar, body);
-
-	return l0a;
+	return expression;
 }
 
 sLinkedListNode* deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
-	sLinkedListNode *grammar_node_stack = NULL;
-	sGrammar *current_grammar = NULL;
-	sGrammarNode *current_grammar_node = NULL;
-	sPrimitive *current_primitive = linked_list_first(*primitives);
+	//初始化变量
+	sLinkedListNode *grammar_node_stack = NULL;  //语法栈
+	sGrammar *current_grammar = NULL;  //当前语法
+	sGrammarNode *current_grammar_node = NULL;  //当前节点
+	sPrimitive *current_primitive = linked_list_first(*primitives);  //当前符号
 	*primitives = linked_list_remove_first(*primitives);
-	sGrammarTreeNode *root_node = grammar_tree_node_new();
-	sGrammarTreeNode *current_node = root_node;
+
+	//用于构建中间表示的上下文
 	sContext *context = (sContext*) malloc(sizeof(sContext));
 	context->IRs = NULL;
 	context->oprands = NULL;
 	context->ops = NULL;
 	context->label_base = 1 << 12;
 	context->next_assign_label = 1 << 12;
+	context->label_stack = NULL;
+	context->variable = NULL;
+	context->stack_offset = 0;
 
 	while (*primitives != NULL || grammar_node_stack != NULL) {
 		int type = primitive_get_type(current_primitive);
@@ -55,13 +62,17 @@ sLinkedListNode* deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 		if (current_grammar_node == NULL) {
 			sGrammarBody *body = NULL;
 			if (current_grammar == NULL) {
+				//如果当前节点为空且产生式为空，则从开始文法开始
 				body = grammar_get_first_body(start_grammar);
 			} else {
+				//如果当前节点为空而产生式不为空，则继续当前产生式
 				body = grammar_get_first_body(current_grammar);
 			}
 
+			//用于判断一条语法能够推导出空
 			int deduces_null = 0;
 
+			//寻找合适的产生式
 			while (body != NULL) {
 				sLinkedListNode *firsts = grammar_body_get_firsts(body);
 
@@ -77,6 +88,7 @@ sLinkedListNode* deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 			}
 
 			if (body == NULL) {
+				//如果没有产生式可以推导，则试图推导出空
 				if (deduces_null == 1) {
 					current_grammar_node = linked_list_last(grammar_node_stack);
 					grammar_node_stack = linked_list_remove_last(
@@ -88,16 +100,19 @@ sLinkedListNode* deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 				current_grammar_node = grammar_body_get_first_node(body);
 				grammar_body_by_func(body);
 			}
-		} else {
+		} else {  //如果当前节点不为空
 			if (grammar_node_is_function_node(current_grammar_node)) {
+				//如果当前节点为动作节点，则执行动作
 				grammar_node_function(current_grammar_node, context);
 				current_grammar_node = grammar_node_get_next(
 						current_grammar_node);
 			} else if (grammar_node_get_type(current_grammar_node) != 0) {
+				//如果当前节点匹配一个终结符号，则尝试匹配
 				if (grammar_node_get_type(current_grammar_node) == type) {
 					if (grammar_node_has_function(current_grammar_node)) {
 						context->parameter = grammar_node_get_type(
 								current_grammar_node);
+						context->primitive = current_primitive;
 						grammar_node_function(current_grammar_node, context);
 					}
 
@@ -106,6 +121,7 @@ sLinkedListNode* deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 					current_primitive = linked_list_first(*primitives);
 					*primitives = linked_list_remove_first(*primitives);
 
+					//如果一条产生式匹配完成，则弹出语法栈顶端的产生式
 					if (current_grammar_node == NULL) {
 						current_grammar_node = linked_list_last(
 								grammar_node_stack);
@@ -116,6 +132,8 @@ sLinkedListNode* deduce(sGrammar *start_grammar, sLinkedListNode **primitives) {
 					//should throw an exception
 				}
 			} else {
+				//如果当前节点匹配一个非终结符号
+				//则将当前产生式入栈，将当前语法设置为该非终结符号对应的语法
 				grammar_node_stack = linked_list_append(grammar_node_stack,
 						grammar_node_get_next(current_grammar_node));
 				current_grammar = grammar_node_get_value(current_grammar_node);

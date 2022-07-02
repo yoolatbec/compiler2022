@@ -10,13 +10,11 @@
 #include <stdlib.h>
 
 void print_IRs(sLinkedListNode *IRs, int base_label) {
-	while (IRs != NULL) {
-		IR *ir = linked_list_first(IRs);
-		IRs = linked_list_remove_first(IRs);
+	size_t len = linked_list_size(IRs);
 
-		printf("result: %d, op: %d, oprand0: %d, oprand1: %d\n", ir->result,
-				ir->op, ir->oprand0, ir->oprand1);
-
-		free(ir);
+	for (int i = 0; i < len; i++) {
+		IR *ir = linked_list_nth(IRs, i);
+		printf("opcode: %d, oprand0: %d, oprand1: %d, result id: %d\n",
+				ir->op, ir->oprand0, ir->oprand1, ir->result);
 	}
 }

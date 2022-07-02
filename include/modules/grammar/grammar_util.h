@@ -11,18 +11,82 @@
 #include <modules/grammar/grammar.h>
 
 /**
- * expected grammar:
- * L0a -> L1a L0b
- * L0b -> + L1a L0b | - L1a L0b | null
- * L1a -> Term L1b
- * L1b -> * Term L1b | / Term L1b | % Term L1b | null
- * Term -> - int | int | (L0a)
+ * 使用的文法:
+ * Expressions
+ * 	: Definition ; Expressions
+ * 	| Assignment ; Expressions
+ * 	| IfStatement Expressions
+ * 	| WhileStatement Expressions
+ * 	| null
+ * 	;
+ *
+ * Definition
+ * 	: int identifier
+ * 	;
+ *
+ * Assignment
+ * 	: identifier = AdditiveStatement
+ * 	;
+ *
+ * AdditiveStatement
+ * 	: MultiplicativeStatement AdditiveStatement_
+ * 	;
+ * AdditiveStatement_
+ * 	: null
+ * 	| + MultiplicativeStatement AdditiveStatement_
+ * 	| - MultiplicativeStatement AdditiveStatement_
+ * 	;
+ *
+ * MultiplicativeStatement
+ * 	: Term MultiplicativeStatement_
+ * 	;
+ *
+ * MultiplicativeStatement_
+ * 	: * Term MultiplicativeStatement_
+ * 	| / Term MultiplicativeStatement_
+ * 	| % Term MultiplicativeStatement_
+ * 	| null
+ * 	;
+ *
+ * Term
+ * 	: identifier
+ * 	| integer
+ * 	| ( AdditiveStatement )
+ * 	;
+ *
+ * IfStatement
+ * 	: if ( BooleanStatement ) { Expressions } ElseStatement
+ * 	;
+ * ElseStatement
+ * 	: null
+ * 	| else { Expressions }
+ * 	;
+ *
+ * WhileStatement
+ * 	: while ( BooleanStatement ) { Expressions }
+ * 	;
+ *
+ * BooleanStatement
+ * 	: AdditiveStatement RelativeOperator AdditiveStatement
+ * 	;
+ *
+ * RelativeOperator
+ * 	: > | < | >= | <= | != | ==
  */
 
-sGrammar* grammar_construct_term();
-sGrammar* grammar_construct_l1b(sGrammar*);
-sGrammar* grammar_construct_l1a(sGrammar*, sGrammar*);
-sGrammar* grammar_construct_l0b(sGrammar*);
-sGrammar* grammar_construct_l0a(sGrammar*, sGrammar*);
+void grammar_construct_expressions(sGrammar**, sGrammar*, sGrammar*, sGrammar*,
+		sGrammar*);  //构建Expressions文法
+sGrammar* grammar_construct_definition();  //构建Definition文法
+sGrammar* grammar_construct_assignment(sGrammar*);  //构建Assignment文法
+void grammar_construct_additive_statement(sGrammar**, sGrammar*, sGrammar*);  //构建AdditiveStatement文法
+sGrammar* grammar_construct_additive_statement_(sGrammar*);  //构建AdditiveStatement_文法
+sGrammar* grammar_construct_multiplicative_statement(sGrammar*, sGrammar*);  //构建MultiplicativeStatement文法
+sGrammar* grammar_construct_multiplicative_statement_(sGrammar*);  //构建MultiplicativeStatement_文法
+sGrammar* grammar_construct_term(sGrammar*);  //构建Term文法
+sGrammar* grammar_construct_if_statement(sGrammar*, sGrammar*, sGrammar*);  //构建IfStatement文法
+sGrammar* grammar_construct_else_statement(sGrammar*);  //构建ElseStatement文法
+sGrammar* grammar_construct_while_statement(sGrammar*, sGrammar*);  //构建WhileStatement文法
+sGrammar* grammar_construct_boolean_statement(sGrammar*, sGrammar*);  //构建BooleanStatement文法
+sGrammar* grammar_construct_relative_operator();  //构建RelativeOperator文法
 
 #endif /* INCLUDE_MODULES_GRAMMAR_GRAMMAR_UTIL_H_ */

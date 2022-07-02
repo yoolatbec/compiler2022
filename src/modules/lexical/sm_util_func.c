@@ -8,6 +8,10 @@
 #include <modules/lexical/sm_util_func.h>
 #include <stdlib.h>
 
+/*
+ * identifier构成：
+ * [a-zA-Z_][0-9a-zA-Z_]*
+ */
 int sm_build_identifier_acc_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -31,36 +35,27 @@ int sm_build_identifier_acc_path(sSMNode *head) {
 	edge->next = NULL;
 	edge->data = NULL;
 	edge->target_node = node;
-	edge->by_effect = identifier_by_effect_func;
+	edge->by_effect = append_to_buffer_by_func;
 
 	edge = (sSMEdge*) malloc(sizeof(sSMEdge));
 	node->first_edge = edge;
 	node->node_attr = PRIM_ID_IDENTIFIER;
-	node->action = buffer_write_back_by_effect_func;
+	node->action = identifier_primitive_by_func;
 
 	edge->acc_func = identifier_char_acc_func;
 	edge->data = NULL;
 	edge->next = NULL;
-	edge->by_effect = identifier_by_effect_func;
+	edge->by_effect = append_to_buffer_by_func;
 
-	node = (sSMNode*) malloc(sizeof(sSMNode));
 	edge->target_node = node;
-
-	node->node_attr = PRIM_ID_IDENTIFIER;
-	node->action = buffer_write_back_by_effect_func;
-
-	edge = (sSMEdge*) malloc(sizeof(sSMEdge));
-	edge->acc_func = identifier_char_acc_func;
-	edge->next = NULL;
-	edge->data = NULL;
-	edge->target_node = node;
-	edge->by_effect = identifier_by_effect_func;
-
-	node->first_edge = edge;
 
 	return SUCCESS;
 }
 
+/*
+ * 十进制数字构成：
+ * [1-9][0-9]*
+ */
 int sm_build_integer_acc_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -81,14 +76,17 @@ int sm_build_integer_acc_path(sSMNode *head) {
 
 	sSMNode *node = (sSMNode*) malloc(sizeof(sSMNode));
 	node->node_attr = PRIM_ID_INTEGER;
+	node->action = integer_primitive_by_func;
 
 	edge->acc_func = nozero_number_char_acc_func;
+	edge->by_effect = append_to_buffer_by_func;
 	edge->data = NULL;
 	edge->next = NULL;
 	edge->target_node = node;
 
 	edge = (sSMEdge*) malloc(sizeof(sSMEdge));
 	edge->acc_func = number_char_acc_func;
+	edge->by_effect = append_to_buffer_by_func;
 	edge->data = NULL;
 	edge->target_node = node;
 	node->first_edge = edge;
@@ -131,6 +129,10 @@ int sm_build_integer_acc_path(sSMNode *head) {
 	return SUCCESS;
 }
 
+/*
+ * 八进制数字构成：
+ * 0[0-7]*
+ */
 int sm_build_octal_integer_acc_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -151,10 +153,12 @@ int sm_build_octal_integer_acc_path(sSMNode *head) {
 
 	sSMNode *node = (sSMNode*) malloc(sizeof(sSMNode));
 	node->node_attr = PRIM_ID_OCTAL_INTEGER;
+	node->action = octal_integer_primitive_by_func;
 	edge->acc_func = single_char_acc_func;
 	edge->data = (char*) '0';
 	edge->next = NULL;
 	edge->target_node = node;
+	edge->by_effect = append_to_buffer_by_func;
 
 	sSMNode *n = node;
 
@@ -162,16 +166,19 @@ int sm_build_octal_integer_acc_path(sSMNode *head) {
 	edge->acc_func = nozero_octal_number_char_acc_func;
 	edge->data = NULL;
 	node->first_edge = edge;
+	edge->by_effect = append_to_buffer_by_func;
 
 	node = (sSMNode*) malloc(sizeof(sSMNode));
 	edge->target_node = node;
 	node->node_attr = PRIM_ID_OCTAL_INTEGER;
+	node->action = octal_integer_primitive_by_func;
 
 	edge = (sSMEdge*) malloc(sizeof(sSMEdge));
 	node->first_edge = edge;
 	edge->acc_func = octal_number_char_acc_func;
 	edge->data = NULL;
 	edge->target_node = node;
+	edge->by_effect = append_to_buffer_by_func;
 
 	edge->next = (sSMEdge*) malloc(sizeof(sSMEdge));
 	edge = edge->next;
@@ -237,6 +244,10 @@ int sm_build_octal_integer_acc_path(sSMNode *head) {
 	return SUCCESS;
 }
 
+/*
+ * 十六进制数字构成：
+ * (0x|0X)[0-9a-fA-F]+
+ */
 int sm_build_hexadecimal_integer_acc_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -326,6 +337,10 @@ int sm_build_hexadecimal_integer_acc_path(sSMNode *head) {
 	return SUCCESS;
 }
 
+/*
+ * 二进制数字构成：
+ * (0b|0B)(0|1)+
+ */
 int sm_build_binary_integer_acc_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -417,6 +432,10 @@ int sm_build_binary_integer_acc_path(sSMNode *head) {
 	return SUCCESS;
 }
 
+/*
+ * 字符串构成：
+ * " 除换行外任何字符 "
+ */
 int sm_build_string_acc_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -454,7 +473,7 @@ int sm_build_string_acc_path(sSMNode *head) {
 	edge->acc_func = any_char_acc_func;
 	edge->data = "\\\"";
 	edge->target_node = node;
-	edge->by_effect = string_by_effect_func;
+	edge->by_effect = NULL;
 	node->action = NULL;
 
 	edge->next = (sSMEdge*) malloc(sizeof(sSMEdge));
@@ -464,7 +483,7 @@ int sm_build_string_acc_path(sSMNode *head) {
 	edge->acc_func = single_char_acc_func;
 	edge->data = (char*) '\"';
 	edge->target_node = node;
-	node->action = buffer_write_back_by_effect_func;
+	node->action = NULL;
 
 	node->first_edge = NULL;
 	node->node_attr = PRIM_ID_STRING;
@@ -490,12 +509,10 @@ int sm_build_string_acc_path(sSMNode *head) {
 	return SUCCESS;
 }
 
-//int sm_build_float_acc_path(sSMNode *head) {
-//	if(head == NULL){
-//		return INVALID_ARGUMENT;
-//	}
-//}
-
+/*
+ * 字符构成：
+ * ' 字符 '
+ */
 int sm_build_char_acc_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -531,7 +548,7 @@ int sm_build_char_acc_path(sSMNode *head) {
 	edge->target_node = node;
 	edge->next = (sSMEdge*) malloc(sizeof(sSMEdge));
 	edge = edge->next;
-	edge->by_effect = char_by_effect_func;
+	edge->by_effect = NULL;
 
 	node = (sSMNode*) malloc(sizeof(sSMNode));
 	edge->target_node = node;
@@ -542,11 +559,15 @@ int sm_build_char_acc_path(sSMNode *head) {
 
 	node->first_edge = NULL;
 	node->node_attr = PRIM_ID_CHAR;
-	node->action = buffer_write_back_by_effect_func;
+	node->action = NULL;
 
 	return SUCCESS;
 }
 
+/*
+ * 空白符：
+ * \n | \t | \s
+ */
 int sm_build_blank_ignore_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -584,6 +605,10 @@ int sm_build_blank_ignore_path(sSMNode *head) {
 	return SUCCESS;
 }
 
+/*
+ * 注释构成：
+ * \/ \/ 任何字符 \n
+ */
 int sm_build_comment_ignore_path(sSMNode *head) {
 	if (head == NULL) {
 		return INVALID_ARGUMENT;
@@ -603,7 +628,7 @@ int sm_build_comment_ignore_path(sSMNode *head) {
 
 	sSMNode *node = (sSMNode*) malloc(sizeof(sSMNode));
 	edge->acc_func = single_char_acc_func;
-	edge->data = (char*) '\\';
+	edge->data = (char*) '/';
 	edge->next = NULL;
 	edge->by_effect = NULL;
 	edge->target_node = node;
@@ -614,7 +639,7 @@ int sm_build_comment_ignore_path(sSMNode *head) {
 
 	node = (sSMNode*) malloc(sizeof(sSMNode));
 	edge->acc_func = single_char_acc_func;
-	edge->data = (char*) '\\';
+	edge->data = (char*) '/';
 	edge->next = NULL;
 	edge->by_effect = NULL;
 	edge->target_node = node;
